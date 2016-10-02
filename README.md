@@ -4,3 +4,5 @@ This package will automatically download the latest Bliss package and install it
 Only tested for x86 QNAP NAS.
 
 Known Issues - Audio Fingerprinting does not work yet as it requires additional libraries to be compiled.
+
+This needs the QNAP QDK to  build the QPKG - see the QNAP Forum for details in installing the QDK and building a QPKG
