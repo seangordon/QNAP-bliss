@@ -165,7 +165,7 @@ pkg_pre_install(){
 
   [ -f ${SYS_QPKG_DIR}/install/${WGET_FILENAME} ] && rm ${SYS_QPKG_DIR}/install/${WGET_FILENAME}
   # Specify User Agent to allow blisshq.com to track the number of downloads from QNAP users
-  wget --user-agent=QNAP ${WGET_URL}
+  wget --no-check-certificate --user-agent=QNAP ${WGET_URL}
 
   if [[ $? != 0 ]]; then
     if [ -d ${SYS_PUBLIC_PATH} ] && [ -f ${SYS_PUBLIC_PATH}/${WGET_FILENAME} ]; then
