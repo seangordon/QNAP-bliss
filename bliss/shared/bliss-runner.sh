@@ -11,14 +11,12 @@ if [ -d /usr/local/jre ]; then
 fi
 
 BLISS_PID=/var/run/bliss.pid
-#BLISS_PROC=felix.jar
 BLISS_PROC=bliss-splash
 
 function get_pid
 {
     local name=$1
     ps | grep $name | grep -v grep | awk '{print $1}'
-#    ps | grep "bliss\/bin" | grep -v grep | awk '{print $1}'
 }
 
 function pid_running
@@ -97,6 +95,9 @@ case "$1" in
 
     INSTALL_PATH=$(/sbin/getcfg $QPKG_NAME Install_Path -d "" -f $CONF)
    
+    # Set Bliss Temporary Files dir and launcher (needed for restart after updates)
+    export VMARGS=-Djava.io.tmpdir=${INSTALL_PATH}/tmp
+
     # Start the server
     ${INSTALL_PATH}/bin/bliss.sh & 
     
