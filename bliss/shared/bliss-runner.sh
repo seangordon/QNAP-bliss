@@ -1,17 +1,15 @@
 #!/bin/sh
 CONF=/etc/config/qpkg.conf
 QPKG_NAME="bliss"
+INSTALL_PATH=`/sbin/getcfg $QPKG_NAME Install_Path -f ${CONF}`
+BLISS_PID=/var/run/bliss.pid
+BLISS_PROC=bliss-splash
 
-PREFIX=/usr
-
-LN=/bin/ln
+cd "${INSTALL_PATH}"
 
 if [ -d /usr/local/jre ]; then
     export JAVA_HOME=/usr/local/jre
 fi
-
-BLISS_PID=/var/run/bliss.pid
-BLISS_PROC=bliss-splash
 
 function get_pid
 {
@@ -92,8 +90,6 @@ case "$1" in
         rm -f $BLISS_PID
     fi
     kill_proc $BLISS_PROC
-
-    INSTALL_PATH=$(/sbin/getcfg $QPKG_NAME Install_Path -d "" -f $CONF)
    
     # Set Bliss Temporary Files dir and launcher (needed for restart after updates)
     export VMARGS=-Djava.io.tmpdir=${INSTALL_PATH}/tmp
