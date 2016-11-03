@@ -97,6 +97,7 @@ case "$1" in
    
     # Set Bliss Temporary Files dir and launcher (needed for restart after updates)
     export VMARGS=-Djava.io.tmpdir=${INSTALL_PATH}/tmp
+    export BLISS_LAUNCHER_PROPERTY="-Dbliss.launcher=${INSTALL_PATH}/bliss-start-after-update.sh"
 
     # Start the server
     ${INSTALL_PATH}/bin/bliss.sh & 
