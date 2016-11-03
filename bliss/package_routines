@@ -123,6 +123,10 @@
 # Define any package specific requirement checks that shall be
 # performed before the package is installed.
 ######################################################################
+
+WGET_URL="`${CMD_WGET} -qO- http://www.blisshq.com/app/latest-linux-version`"
+
+
 pkg_check_requirement(){
   # Hack - for some reason QNAP install environment doesn't see the JAVA_HOME variable
   JAVA_HOME=/usr/local/jre
@@ -151,11 +155,10 @@ pkg_check_requirement(){
 pkg_pre_install(){
   log "Enter pre_install"
 
-  WGET_URL="`wget -qO- http://www.blisshq.com/app/latest-linux-version`"
-  WGET_FILENAME="`echo ${WGET_URL} | sed -r "s%^.*/(.*)%\1%"`"
+  WGET_FILENAME="`${CMD_ECHO} ${WGET_URL} | ${CMD_SED} -r "s%^.*/(.*)%\1%"`"
 
   cd ${SYS_QPKG_DIR}
-  mkdir install
+  "${CMD_MKDIR}" install
   cd install
  
   log "SYS_QPKG_DIR = ${SYS_QPKG_DIR}"
@@ -163,13 +166,13 @@ pkg_pre_install(){
   log "WGET_FILENAME = ${WGET_FILENAME}"
   log "SYS_PUBLIC_PATH = ${SYS_PUBLIC_PATH}"
 
-  [ -f ${SYS_QPKG_DIR}/install/${WGET_FILENAME} ] && rm ${SYS_QPKG_DIR}/install/${WGET_FILENAME}
+  [ -f ${SYS_QPKG_DIR}/install/${WGET_FILENAME} ] && "${CMD_RM}" ${SYS_QPKG_DIR}/install/${WGET_FILENAME}
   # Specify User Agent to allow blisshq.com to track the number of downloads from QNAP users
-  wget --no-check-certificate --user-agent=QNAP ${WGET_URL}
+  "${CMD_WGET}" --no-check-certificate --user-agent=QNAP ${WGET_URL}
 
   if [[ $? != 0 ]]; then
     if [ -d ${SYS_PUBLIC_PATH} ] && [ -f ${SYS_PUBLIC_PATH}/${WGET_FILENAME} ]; then
-      cp ${SYS_PUBLIC_PATH}/${WGET_FILENAME} ${SYS_QPKG_INSTALL_PATH}/install
+      "${CMD_CP}" ${SYS_PUBLIC_PATH}/${WGET_FILENAME} ${SYS_QPKG_INSTALL_PATH}/install
     else 
       warn_log "There was a problem downloading ${WGET_FILENAME} from the official download link, "
       warn_log "which was \"${WGET_URL}\" "
@@ -183,8 +186,7 @@ pkg_pre_install(){
 pkg_install(){
   log "Enter install"
 
-  WGET_URL="`wget -qO- http://www.blisshq.com/app/latest-linux-version`"
-  WGET_FILENAME="`echo ${WGET_URL} | sed -r "s%^.*/(.*)%\1%"`"
+  WGET_FILENAME="`${CMD_ECHO} ${WGET_URL} | ${CMD_SED} -r "s%^.*/(.*)%\1%"`"
 
   log "SYS_QPKG_DIR = ${SYS_QPKG_DIR}"
   log "WGET_URL = ${WGET_URL}"
@@ -195,7 +197,7 @@ pkg_install(){
 
   # Set Install Path
   log INSTALL_PATH=${SYS_QPKG_DIR}
-  echo INSTALL_PATH=${SYS_QPKG_DIR} > ${SYS_QPKG_DIR}/install/auto-install.properties
+  "${CMD_ECHO}" INSTALL_PATH=${SYS_QPKG_DIR} > ${SYS_QPKG_DIR}/install/auto-install.properties
   #run the installer
   log "Calling - /usr/local/jre/bin/java -jar ${SYS_QPKG_DIR}/install/${WGET_FILENAME} -options ${SYS_QPKG_DIR}/install/auto-install.properties"
   /usr/local/jre/bin/java -jar ${SYS_QPKG_DIR}/install/${WGET_FILENAME} -options ${SYS_QPKG_DIR}/install/auto-install.properties 
