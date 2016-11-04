@@ -1,17 +1,16 @@
 #!/bin/sh
 CONF=/etc/config/qpkg.conf
 QPKG_NAME="bliss"
+INSTALL_PATH=`/sbin/getcfg $QPKG_NAME Install_Path -f ${CONF}`
+BLISS_PID=/var/run/bliss.pid
+BLISS_PROC=bliss-splash
+CALLED_BY_APP=`cat /proc/$PPID/cmdline | xargs -0 echo | awk '{print $1}'`
 
-PREFIX=/usr
-
-LN=/bin/ln
+cd "${INSTALL_PATH}"
 
 if [ -d /usr/local/jre ]; then
     export JAVA_HOME=/usr/local/jre
 fi
-
-BLISS_PID=/var/run/bliss.pid
-BLISS_PROC=bliss-splash
 
 function get_pid
 {
@@ -76,6 +75,11 @@ function kill_pid
     done
 }
 
+# Fix for Automatic bliss update: Start bliss if this script is called by java.
+if [ $(basename $CALLED_BY_APP) == "java" ]; then
+   set start
+fi
+
 
 case "$1" in
   start)
@@ -92,11 +96,10 @@ case "$1" in
         rm -f $BLISS_PID
     fi
     kill_proc $BLISS_PROC
-
-    INSTALL_PATH=$(/sbin/getcfg $QPKG_NAME Install_Path -d "" -f $CONF)
    
     # Set Bliss Temporary Files dir and launcher (needed for restart after updates)
     export VMARGS=-Djava.io.tmpdir=${INSTALL_PATH}/tmp
+    export BLISS_LAUNCHER_PROPERTY="-Dbliss.launcher=${INSTALL_PATH}/bliss-runner.sh"
 
     # Start the server
     ${INSTALL_PATH}/bin/bliss.sh & 
