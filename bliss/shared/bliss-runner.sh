@@ -6,6 +6,10 @@ BLISS_PID=/var/run/bliss.pid
 BLISS_PROC=bliss-splash
 CALLED_BY_APP=`cat /proc/$PPID/cmdline | xargs -0 echo | awk '{print $1}'`
 
+PREFIX=/usr
+
+LN=/bin/ln
+
 cd "${INSTALL_PATH}"
 
 if [ -d /usr/local/jre ]; then
