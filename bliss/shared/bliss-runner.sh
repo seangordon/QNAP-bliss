@@ -5,7 +5,8 @@ INSTALL_PATH=`/sbin/getcfg $QPKG_NAME Install_Path -f ${CONF}`
 BLISS_PID=/var/run/bliss.pid
 BLISS_PROC=bliss-splash
 CALLED_BY_APP=`cat /proc/$PPID/cmdline | xargs -0 echo | awk '{print $1}'`
-STDOUT_LOG=$INSTALL_PATH/tmp/stdout.log
+TMP_DIR=$INSTALL_PATH/tmp
+STDOUT_LOG=$TMP_DIR/stdout.log
 
 PREFIX=/usr
 
@@ -103,11 +104,15 @@ case "$1" in
     kill_proc $BLISS_PROC
     
     # Recreate the stdout log so the version checker, later, has something to wait on
-    rm $STDOUT_LOG  
-    touch $STDOUT_LOG 
+    if [ -f $STDOUT_LOG ]; then
+        rm $STDOUT_LOG  
+        touch $STDOUT_LOG 
+    fi
+
+    mkdir -p $TMP_DIR
 
     # Set Bliss Temporary Files dir and launcher (needed for restart after updates)
-    export VMARGS=-Djava.io.tmpdir=${INSTALL_PATH}/tmp
+    export VMARGS=-Djava.io.tmpdir=${TMP_DIR}
     export BLISS_LAUNCHER_PROPERTY="-Dbliss.launcher=${INSTALL_PATH}/bliss-runner.sh"
 
     # Start the server
