@@ -5,6 +5,7 @@ INSTALL_PATH=`/sbin/getcfg $QPKG_NAME Install_Path -f ${CONF}`
 BLISS_PID=/var/run/bliss.pid
 BLISS_PROC=bliss-splash
 CALLED_BY_APP=`cat /proc/$PPID/cmdline | xargs -0 echo | awk '{print $1}'`
+STDOUT_LOG=$INSTALL_PATH/tmp/stdout.log
 
 PREFIX=/usr
 
@@ -100,18 +101,28 @@ case "$1" in
         rm -f $BLISS_PID
     fi
     kill_proc $BLISS_PROC
-   
+    
+    # Recreate the stdout log so the version checker, later, has something to wait on
+    rm $STDOUT_LOG  
+    touch $STDOUT_LOG 
+
     # Set Bliss Temporary Files dir and launcher (needed for restart after updates)
     export VMARGS=-Djava.io.tmpdir=${INSTALL_PATH}/tmp
     export BLISS_LAUNCHER_PROPERTY="-Dbliss.launcher=${INSTALL_PATH}/bliss-runner.sh"
 
     # Start the server
-    ${INSTALL_PATH}/bin/bliss.sh & 
+    ${INSTALL_PATH}/bin/bliss.sh > "$STDOUT_LOG" 2>&1 & 
     
     # Capture the PID
     PID=$!
     echo Process ID $PID
     echo $PID > $BLISS_PID 
+    
+    # Check stdout for the version number. This is a little dodgy! It only quits
+    # because there's content after the match. Couldn't find a better way to do it.
+    # Prefer this to checking update files, which couples to the update mechanism.
+    VERSION=$(tail -f $STDOUT_LOG | grep -m1 -o "[0-9]\{8\}")
+    /sbin/setcfg $QPKG_NAME Version $VERSION -f ${CONF}
     ;;
 
   stop)
