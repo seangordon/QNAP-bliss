@@ -109,8 +109,11 @@
 #PKG_MAIN_REMOVE="{
 #}"
 #
-#PKG_POST_REMOVE="{
-#}"
+PKG_POST_REMOVE="{
+  BLISS_WORKING_DIR="\${SYS_MULTIMEDIA_PATH}/../homes/admin/.bliss"
+  log "Will remove \$BLISS_WORKING_DIR"
+  rm -rf \$BLISS_WORKING_DIR 
+}"
 #
 ######################################################################
 # Define any package specific initialization that shall be performed
@@ -203,6 +206,13 @@ pkg_install(){
   /usr/local/jre/bin/java -jar ${SYS_QPKG_DIR}/install/${WGET_FILENAME} -options ${SYS_QPKG_DIR}/install/auto-install.properties 
   #rm ${SYS_QPKG_DIR}/install/auto-install.properties
   #rm ${SYS_QPKG_DIR}/install/${WGET_FILENAME}
+  
+  BLISS_WORKING_DIR="${SYS_MULTIMEDIA_PATH}/../homes/admin/.bliss"
+  #default settings
+  if [ ! -f ${BLISS_WORKING_DIR}/settings ]; then
+    mkdir -p ${BLISS_WORKING_DIR}
+    echo "musicLibrary=/share/Multimedia/" > ${BLISS_WORKING_DIR}/settings
+  fi
 
   log "Exit install"
 }
