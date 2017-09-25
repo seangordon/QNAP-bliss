@@ -109,11 +109,8 @@
 #PKG_MAIN_REMOVE="{
 #}"
 #
-PKG_POST_REMOVE="{
-  BLISS_WORKING_DIR="\${SYS_MULTIMEDIA_PATH}/../homes/admin/.bliss"
-  log "Will remove \$BLISS_WORKING_DIR"
-  rm -rf \$BLISS_WORKING_DIR 
-}"
+#PKG_POST_REMOVE="{
+#}"
 #
 ######################################################################
 # Define any package specific initialization that shall be performed
