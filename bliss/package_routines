@@ -207,7 +207,8 @@ pkg_install(){
   #rm ${SYS_QPKG_DIR}/install/auto-install.properties
   #rm ${SYS_QPKG_DIR}/install/${WGET_FILENAME}
   
-  BLISS_WORKING_DIR="${SYS_MULTIMEDIA_PATH}/../homes/admin/.bliss"
+  BLISS_WORKING_DIR="${SYS_QPKG_DIR}/.bliss"
+  log "BLISS_WORKING_DIR = ${BLISS_WORKING_DIR}"
   #default settings
   if [ ! -f ${BLISS_WORKING_DIR}/settings ]; then
     mkdir -p ${BLISS_WORKING_DIR}
