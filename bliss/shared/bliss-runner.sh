@@ -139,9 +139,6 @@ case "$1" in
     # Prefer this to checking update files, which couples to the update mechanism.
     VERSION=$(tail -f $STDOUT_LOG | grep -m1 -o "[0-9]\{8\}")
     /sbin/setcfg $QPKG_NAME Version $VERSION -f ${CONF}
-    
-    sleep 5
-    kill -0 $PID || $CMD_LOG_TOOL -t0 -uSystem -p127.0.0.1 -mlocalhost -a `cat $STDOUT_LOG`
     ;;
 
   stop)
