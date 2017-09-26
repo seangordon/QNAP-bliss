@@ -5,6 +5,7 @@ INSTALL_PATH=`/sbin/getcfg $QPKG_NAME Install_Path -f ${CONF}`
 BLISS_PID=/var/run/bliss.pid
 BLISS_PROC=bliss-splash
 CALLED_BY_APP=`cat /proc/$PPID/cmdline | xargs -0 echo | awk '{print $1}'`
+WORKING_DIR=$INSTALL_PATH/.bliss
 TMP_DIR=$INSTALL_PATH/tmp
 STDOUT_LOG=$TMP_DIR/stdout.log
 
@@ -112,7 +113,7 @@ case "$1" in
     mkdir -p $TMP_DIR
 
     # Set Bliss Temporary Files dir and launcher (needed for restart after updates)
-    export VMARGS=-Djava.io.tmpdir=${TMP_DIR}
+    export VMARGS="-Djava.io.tmpdir=${TMP_DIR} -Dbliss_working_directory=${INSTALL_PATH}"
     export BLISS_LAUNCHER_PROPERTY="-Dbliss.launcher=${INSTALL_PATH}/bliss-runner.sh"
 
     # Start the server
