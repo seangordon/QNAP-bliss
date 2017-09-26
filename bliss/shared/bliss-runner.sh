@@ -92,6 +92,7 @@ case "$1" in
   start)
     # Check if the package is enabled
     ENABLED=$(/sbin/getcfg $QPKG_NAME Enable -u -d FALSE -f $CONF)
+    CMD_LOG_TOOL="/sbin/log_tool"
     if [ "$ENABLED" != "TRUE" ]; then
         echo "$QPKG_NAME is disabled."
         exit 1
@@ -124,11 +125,23 @@ case "$1" in
     echo Process ID $PID
     echo $PID > $BLISS_PID 
     
+    sleep 5
+    if ! kill -0 $PID 2>/dev/null; then
+        echo "Didn't start";
+        ERROR_LOGS=$(cat $STDOUT_LOG)
+        echo $ERROR_LOGS
+        $CMD_LOG_TOOL -t2 -uSystem -p127.0.0.1 -mlocalhost -a "$ERROR_LOGS"
+        exit 1
+    fi
+
     # Check stdout for the version number. This is a little dodgy! It only quits
     # because there's content after the match. Couldn't find a better way to do it.
     # Prefer this to checking update files, which couples to the update mechanism.
     VERSION=$(tail -f $STDOUT_LOG | grep -m1 -o "[0-9]\{8\}")
     /sbin/setcfg $QPKG_NAME Version $VERSION -f ${CONF}
+    
+    sleep 5
+    kill -0 $PID || $CMD_LOG_TOOL -t0 -uSystem -p127.0.0.1 -mlocalhost -a `cat $STDOUT_LOG`
     ;;
 
   stop)
