@@ -134,10 +134,11 @@ case "$1" in
         exit 1
     fi
 
-    # Check stdout for the version number. This is a little dodgy! It only quits
-    # because there's content after the match. Couldn't find a better way to do it.
+    # Check stdout for the version number. This is a little dodgy! It probably only works
+    # because of the previous pause allowing the log file to populate. Couldn't find a better way to do it.
+    # Didn't want to do tail -f because of the possibility of hanging.
     # Prefer this to checking update files, which couples to the update mechanism.
-    VERSION=$(tail -f $STDOUT_LOG | grep -m1 -o "[0-9]\{8\}")
+    VERSION=$(head $STDOUT_LOG | grep "[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]" | cut -d " " -f 3)
     /sbin/setcfg $QPKG_NAME Version $VERSION -f ${CONF}
     ;;
 
